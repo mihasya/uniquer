@@ -12,7 +12,9 @@
 #define PORT 9999
 
 void * handle_request(void *arg) {
-	request *req = (request*)arg;
+	request *req = (request *)arg;
+	//TODO: WTF?!
+	printf("%s", req->question);
 	int id;
 	char resp[255];
 	bzero(resp, sizeof(resp));
@@ -57,7 +59,10 @@ int main() {
 		req.sock = &sock;
 		req.len = &len;
 		req.serv_name = &serv_name;
+		req.question = malloc(strlen(question));
+		bzero(req.question, sizeof(req.question));
 		strcpy(req.question, question);
+
 		pthread_create(&thread, NULL, handle_request, &req);
 	}
 }
