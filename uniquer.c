@@ -25,7 +25,7 @@ int main() {
 	int sock;
 	size_t len;
 	struct sockaddr_in serv_name;
-	char ques[255], resp[255];
+	char question[255];
 
 	unsigned long counter = 0;
 
@@ -49,7 +49,7 @@ int main() {
 		pthread_t thread;
 		request req;
 
-		bzero(question, sizeof(ques));
+		bzero(question, sizeof(question));
 
 		recvfrom (sock, &question, 255, 0, (struct sockaddr *)&serv_name, (unsigned int *)&len);
 
@@ -57,7 +57,7 @@ int main() {
 		req.sock = &sock;
 		req.len = &len;
 		req.serv_name = &serv_name;
-		req.question = question;
+		strcpy(req.question, question);
 		pthread_create(&thread, NULL, handle_request, &req);
 	}
 }
