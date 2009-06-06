@@ -5,18 +5,30 @@
 #include <stdlib.h>
 #include <string.h>
 #include <netinet/in.h>
+#include <pthread.h>
 
+#include "uniquer_lib.h"
 
 #define PORT 9999
+
+void * handle_request(void *arg) {
+	request *req = (request*)arg;
+	int id;
+	char resp[255];
+	bzero(resp, sizeof(resp));
+	id = get_next_id(req->counter);
+	sprintf(resp, "%d", id);
+	sendto(*(req->sock), &resp, 255, 0, (struct sockaddr *)(req->serv_name), *(req->len));
+}
 
 int main() {
 	int sock;
 	size_t len;
 	struct sockaddr_in serv_name;
 	char ques[255], resp[255];
-	
+
 	unsigned long counter = 0;
-	
+
 	sock = socket(AF_INET, SOCK_DGRAM, 0);
 	if (sock < 0) {
 		printf("FAIL!");
@@ -33,14 +45,19 @@ int main() {
 	}
 	len = sizeof(serv_name);
 	for (;;) {
-		//TODO: make this threaded
-		//TODO: use libev?
 		int id;
-		bzero(ques, sizeof(ques));
-		bzero(resp, sizeof(resp));
-		recvfrom (sock, &ques, 255, 0, (struct sockaddr *)&serv_name, (unsigned int *)&len);
-		id = get_next_id(&counter);
-		sprintf(resp, "%d", id);
-		sendto(sock, &resp, 255, 0, (struct sockaddr *)&serv_name, len);
+		pthread_t thread;
+		request req;
+
+		bzero(question, sizeof(ques));
+
+		recvfrom (sock, &question, 255, 0, (struct sockaddr *)&serv_name, (unsigned int *)&len);
+
+		req.counter = &counter;
+		req.sock = &sock;
+		req.len = &len;
+		req.serv_name = &serv_name;
+		req.question = question;
+		pthread_create(&thread, NULL, handle_request, &req);
 	}
 }
