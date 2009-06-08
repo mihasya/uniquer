@@ -1,5 +1,3 @@
-#include <pthread.h>
-
 int counter_init(long unsigned *counter) {
 	//TODO: pull latest counter from a file
 	*counter = 1;
@@ -7,7 +5,6 @@ int counter_init(long unsigned *counter) {
 }
 
 int get_next_id(long unsigned *counter) {
-    //TODO: lock counter
 	//TODO: keep track of counter since last save 
 	//TODO: save counter if it's been 10000
 	int id;

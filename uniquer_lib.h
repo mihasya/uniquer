@@ -4,6 +4,7 @@ typedef struct {
     size_t *len;
     struct sockaddr_in *serv_name;
     char *question;
+    pthread_mutex_t *counter_mutex;
 } request;
 
 int counter_init(unsigned long *counter);

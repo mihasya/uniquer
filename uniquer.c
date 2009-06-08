@@ -11,14 +11,16 @@
 
 #define PORT 9999
 
+pthread_mutex_t counter_mutex;
+
 void * handle_request(void *arg) {
 	request *req = (request *)arg;
-	//TODO: WTF?!
-	printf("%s", req->question);
 	int id;
 	char resp[255];
 	bzero(resp, sizeof(resp));
+	pthread_mutex_lock(req->counter_mutex);
 	id = get_next_id(req->counter);
+	pthread_mutex_unlock(req->counter_mutex);
 	sprintf(resp, "%d", id);
 	sendto(*(req->sock), &resp, 255, 0, (struct sockaddr *)(req->serv_name), *(req->len));
 }
@@ -31,12 +33,12 @@ int main() {
 
 	unsigned long counter = 0;
 
+	//initialize TEH SOCKET!
 	sock = socket(AF_INET, SOCK_DGRAM, 0);
 	if (sock < 0) {
 		printf("FAIL!");
 		exit(1);
 	}
-	//initialize TEH SOCKET!
 	bzero(&serv_name, sizeof(serv_name));
 	serv_name.sin_family = AF_INET;
 	serv_name.sin_port = htons(PORT);
@@ -46,6 +48,9 @@ int main() {
 		exit(1);
 	}
 	len = sizeof(serv_name);
+
+	pthread_mutex_init(&counter_mutex, NULL);
+
 	for (;;) {
 		int id;
 		pthread_t thread;
@@ -55,14 +60,24 @@ int main() {
 
 		recvfrom (sock, &question, 255, 0, (struct sockaddr *)&serv_name, (unsigned int *)&len);
 
+		//pass pointer to the counter to threads
 		req.counter = &counter;
+
+		//pass socket info to thread
 		req.sock = &sock;
 		req.len = &len;
 		req.serv_name = &serv_name;
+
+		//copy the request string in case I want to do something with it later
 		req.question = malloc(strlen(question));
 		bzero(req.question, sizeof(req.question));
 		strcpy(req.question, question);
 
+		//pass pointer to mutex to threads
+		req.counter_mutex = &counter_mutex;
+
 		pthread_create(&thread, NULL, handle_request, &req);
 	}
+	pthread_mutex_destroy(&counter_mutex);
+	pthread_exit(NULL);
 }
