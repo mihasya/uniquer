@@ -52,7 +52,6 @@ int main() {
 	pthread_mutex_init(&counter_mutex, NULL);
 
 	for (;;) {
-		int id;
 		pthread_t thread;
 		request req;
 
