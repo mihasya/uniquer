@@ -8,4 +8,4 @@ typedef struct {
 } request;
 
 int counter_init(unsigned long *counter);
-int get_next_id(unsigned long *counter);
+int get_next_id(unsigned long *counter, unsigned long *id);

@@ -15,11 +15,11 @@ pthread_mutex_t counter_mutex;
 
 void * handle_request(void *arg) {
 	request *req = (request *)arg;
-	int id;
+	unsigned long id;
 	char resp[255];
 	bzero(resp, sizeof(resp));
 	pthread_mutex_lock(req->counter_mutex);
-	id = get_next_id(req->counter);
+	get_next_id(req->counter, &id);
 	pthread_mutex_unlock(req->counter_mutex);
 	sprintf(resp, "%d", id);
 	sendto(*(req->sock), &resp, 255, 0, (struct sockaddr *)(req->serv_name), *(req->len));
@@ -56,7 +56,6 @@ int main() {
 		request req;
 
 		bzero(question, sizeof(question));
-
 		recvfrom (sock, &question, 255, 0, (struct sockaddr *)&serv_name, (unsigned int *)&len);
 
 		//pass pointer to the counter to threads
