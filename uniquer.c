@@ -10,6 +10,7 @@
 #include "uniquer_lib.h"
 
 #define PORT 9999
+#define FILENAME 'counter.txt'
 
 pthread_mutex_t counter_mutex;
 
@@ -18,10 +19,15 @@ void * handle_request(void *arg) {
 	unsigned long id;
 	char resp[255];
 	bzero(resp, sizeof(resp));
-	pthread_mutex_lock(req->counter_mutex);
-	get_next_id(req->counter, &id);
-	pthread_mutex_unlock(req->counter_mutex);
-	sprintf(resp, "%d", id);
+	if (strcmp(req->question, "n\n")==0) {
+		pthread_mutex_lock(req->counter_mutex);
+		get_next_id(req->c_data, &id);
+		pthread_mutex_unlock(req->counter_mutex);
+		sprintf(resp, "%d", id);
+
+	} else {
+		sprintf(resp, "Uknown Command");
+	}
 	sendto(*(req->sock), &resp, 255, 0, (struct sockaddr *)(req->serv_name), *(req->len));
 }
 
@@ -30,8 +36,9 @@ int main() {
 	size_t len;
 	struct sockaddr_in serv_name;
 	char question[255];
+	unsigned long counter, last_save;
 
-	unsigned long counter = 0;
+	counter_data c_data;
 
 	//initialize TEH SOCKET!
 	sock = socket(AF_INET, SOCK_DGRAM, 0);
@@ -58,8 +65,12 @@ int main() {
 		bzero(question, sizeof(question));
 		recvfrom (sock, &question, 255, 0, (struct sockaddr *)&serv_name, (unsigned int *)&len);
 
+		//initialize counter_data
+		c_data.counter = &counter;
+		c_data.last_save = &last_save;
+
 		//pass pointer to the counter to threads
-		req.counter = &counter;
+		req.c_data = &c_data;
 
 		//pass socket info to thread
 		req.sock = &sock;
