@@ -78,9 +78,7 @@ int main() {
 		req.serv_name = &serv_name;
 
 		//copy the request string in case I want to do something with it later
-		req.question = malloc(strlen(question));
-		bzero(req.question, sizeof(req.question));
-		strcpy(req.question, question);
+		req.question = strdup(question);
 
 		//pass pointer to mutex to threads
 		req.counter_mutex = &counter_mutex;
