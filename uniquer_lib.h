@@ -3,8 +3,8 @@
 
 
 typedef struct {
-    unsigned long *counter;
-    unsigned long *last_save;
+    unsigned long long *counter;
+    unsigned long long *last_save;
     char *path;
 } counter_data;
 
@@ -18,4 +18,4 @@ typedef struct {
 } request;
 
 int counter_init(counter_data *c_data);
-int get_next_id(counter_data *c_data, unsigned long *id);
+int get_next_id(counter_data *c_data, unsigned long long *id);

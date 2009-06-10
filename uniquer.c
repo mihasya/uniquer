@@ -16,14 +16,14 @@ pthread_mutex_t counter_mutex;
 
 void * handle_request(void *arg) {
 	request *req = (request *)arg;
-	unsigned long id;
+	unsigned long long id;
 	char resp[255];
 	bzero(resp, sizeof(resp));
 	if (strcmp(req->question, "n\n")==0) {
 		pthread_mutex_lock(req->counter_mutex);
 		get_next_id(req->c_data, &id);
 		pthread_mutex_unlock(req->counter_mutex);
-		sprintf(resp, "%d", id);
+		sprintf(resp, "%lld", id);
 
 	} else {
 		sprintf(resp, "Uknown Command");
@@ -36,8 +36,7 @@ int main() {
 	size_t len;
 	struct sockaddr_in serv_name;
 	char question[255];
-	unsigned long counter, last_save;
-
+	unsigned long long counter = 0, last_save = 0;
 	counter_data c_data;
 
 	//initialize TEH SOCKET!

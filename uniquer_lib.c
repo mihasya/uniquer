@@ -5,7 +5,7 @@ int counter_init(counter_data *c_data) {
 	return 0;
 }
 
-int get_next_id(counter_data *c_data, long unsigned *id) {
+int get_next_id(counter_data *c_data, unsigned long long *id) {
 	//TODO: keep track of counter since last save 
 	//TODO: save counter if it's been 10000
 	if (*(c_data->counter) == 0) {
