@@ -36,6 +36,9 @@ int main() {
 	const short int DEFAULT_PORT = 9999;
 	//TODO: add command line options to override
 
+	//one file descriptor
+	FILE *fd;
+
 	//socket/request stuff
 	int sock;
 	size_t len;
@@ -45,6 +48,13 @@ int main() {
 	//business logic vars
 	unsigned long long counter = 0, last_save = 0;
 	counter_data c_data;
+	//initialize counter_data
+	c_data.counter = &counter;
+	c_data.last_save = &last_save;
+	c_data.path = strdup(DEFAULT_PATH);
+	c_data.save_every = DEFAULT_SAVE_EVERY;
+	c_data.fd = fd;
+	counter_init(&c_data);
 
 	//initialize TEH SOCKET!
 	sock = socket(AF_INET, SOCK_DGRAM, 0);
@@ -72,12 +82,6 @@ int main() {
 		recvfrom (sock, &question, 255, 0, (struct sockaddr *)&serv_name,
 			(unsigned int *)&len);
 
-		//initialize counter_data
-		c_data.counter = &counter;
-		c_data.last_save = &last_save;
-		c_data.path = strdup(DEFAULT_PATH);
-		c_data.save_every = DEFAULT_SAVE_EVERY;
-
 		//pass pointer to the counter to threads
 		req.c_data = &c_data;
 
@@ -95,6 +99,7 @@ int main() {
 		pthread_create(&thread, NULL, handle_request, &req);
 	}
 	//here just in case I add signal handlers for graceful exits later
+	fclose(fd);
 	pthread_mutex_destroy(&counter_mutex);
 	pthread_exit(NULL);
 }

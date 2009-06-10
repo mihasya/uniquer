@@ -4,45 +4,36 @@
 
 int counter_init(counter_data *c_data) {
 	if (*(c_data->counter) == 0) {
-		FILE *fd;
 		char counter_str[40];
-		if ((fd = fopen(c_data->path, "r+")) == NULL) {
-			fd = fopen(c_data->path, "w+");
+		if ((c_data->fd = fopen(c_data->path, "r+")) == NULL) {
+			c_data->fd = fopen(c_data->path, "w+");
 		}
-		fgets(counter_str, 45, fd);
-		if (strcmp(counter_str, "") == 0) {
-			sprintf(counter_str, "%llu\n", (unsigned long long)1);
-			*(c_data->counter) = 1;
-			save_counter(c_data, fd);
+		fgets(counter_str, 40, c_data->fd);
+		*(c_data->counter) = *(c_data->last_save) = atoi(counter_str);
+		if (1 == strlen(counter_str)) {
+			;
 		} else {
-			*(c_data->counter) = *(c_data->last_save) = (atoi(counter_str) + c_data->save_every);
-			++*(c_data->counter);
+			*(c_data->counter) = *(c_data->last_save) = *(c_data->counter) 
+				+ c_data->save_every;
 		}
-		fclose(fd);
+		save_counter(c_data);
 		return 0;
 	} else {
 		return 1;
 	}
-	return 0;
 }
-int save_counter(counter_data *c_data, FILE *fd) {
-	//TODO: something funky happens here
+int save_counter(counter_data *c_data) {
 	char counter_str[40];
 	sprintf(counter_str, "%llu\n", *(c_data->counter));
-	fputs(counter_str, fd);
+	fseek(c_data->fd, 0, SEEK_SET);
+	fputs(counter_str, c_data->fd);
 	*(c_data->last_save) = *(c_data->counter);
+	fflush(c_data->fd);
 }
 int get_next_id(counter_data *c_data, unsigned long long *id) {
-	if (*(c_data->counter) == 0) {
-		counter_init(c_data);
-		*id = *(c_data->counter);
-	} else {
-		*id = ++(*(c_data->counter));
-	}
+	*id = ++(*(c_data->counter));
 	if (*id >= (*(c_data->last_save)+c_data->save_every)) {
-		FILE *fd = fopen(c_data->path, "w+");
-		save_counter(c_data, fd);
-		fclose(fd);
+		save_counter(c_data);
 	}
 	return 0;
 }

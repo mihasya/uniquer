@@ -8,6 +8,7 @@ typedef struct {
     unsigned long long *last_save;
     short int save_every;
     char *path;
+    FILE *fd;
 } counter_data;
 
 typedef struct {
@@ -21,4 +22,4 @@ typedef struct {
 
 int counter_init(counter_data *c_data);
 int get_next_id(counter_data *c_data, unsigned long long *id);
-int save_counter(counter_data *c_data, FILE *fd);
+int save_counter(counter_data *c_data);
