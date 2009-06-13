@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <sys/types.h>
 #include <sys/socket.h>
-
+#include <netinet/in.h>
 
 typedef struct {
     unsigned long long *counter;
@@ -14,8 +14,8 @@ typedef struct {
 typedef struct {
     counter_data *c_data;
     int *sock;
-    size_t *len;
-    struct sockaddr_in *serv_name;
+    struct sockaddr_in cli_name;
+    size_t cli_name_len;
     char *question;
     pthread_mutex_t *counter_mutex;
 } request;

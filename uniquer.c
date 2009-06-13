@@ -12,21 +12,22 @@
 pthread_mutex_t counter_mutex;
 
 void * handle_request(void *arg) {
-	request *req = (request *)arg;
+	request req = *(request *)arg;
 	unsigned long long id;
 	char resp[255];
 	bzero(resp, sizeof(resp));
-	if (strcmp(req->question, "n\n")==0) {
-		pthread_mutex_lock(req->counter_mutex);
-		get_next_id(req->c_data, &id);
-		pthread_mutex_unlock(req->counter_mutex);
+	if (strcmp(req.question, "n\n")==0) {
+		pthread_mutex_lock(req.counter_mutex);
+		get_next_id(req.c_data, &id);
+		pthread_mutex_unlock(req.counter_mutex);
 		sprintf(resp, "%llu", id);
 
 	} else {
 		sprintf(resp, "Uknown Command");
 	}
-	sendto(*(req->sock), &resp, 255, 0, (struct sockaddr *)(req->serv_name),
-		*(req->len));
+	sleep(5);
+	sendto(*(req.sock), &resp, 255, 0, (struct sockaddr *)&(req.cli_name),
+		req.cli_name_len);
 }
 
 int main() {
@@ -77,18 +78,16 @@ int main() {
 	for (;;) {
 		pthread_t thread;
 		request req;
-
 		bzero(question, sizeof(question));
-		recvfrom (sock, &question, 255, 0, (struct sockaddr *)&serv_name,
-			(unsigned int *)&len);
+
+		recvfrom (sock, question, 255, 0, (struct sockaddr *)&(req.cli_name),
+			(unsigned int *)&(req.cli_name_len));
 
 		//pass pointer to the counter to threads
 		req.c_data = &c_data;
 
 		//pass socket info to thread
 		req.sock = &sock;
-		req.len = &len;
-		req.serv_name = &serv_name;
 
 		//copy the request string in case I want to do something with it later
 		req.question = strdup(question);
