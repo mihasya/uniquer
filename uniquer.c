@@ -25,7 +25,6 @@ void * handle_request(void *arg) {
 	} else {
 		sprintf(resp, "Uknown Command");
 	}
-	sleep(5);
 	sendto(*(req.sock), &resp, 255, 0, (struct sockaddr *)&(req.cli_name),
 		req.cli_name_len);
 }
@@ -80,8 +79,17 @@ int main() {
 		request req;
 		bzero(question, sizeof(question));
 
-		recvfrom (sock, question, 255, 0, (struct sockaddr *)&(req.cli_name),
+		/*
+		for whatever reason, I can't dereference members of the struct correctly
+		so I have to make local pointers to it. This is what I'd really like
+		recvfrom (sock, &question, 255, 0, (struct sockaddr *)&(req.cli_name),
 			(unsigned int *)&(req.cli_name_len));
+		*/
+		struct sockaddr_in *cli_name = &(req.cli_name);
+		size_t *cli_name_len = &(req.cli_name_len);
+
+		recvfrom (sock, &question, 255, 0, (struct sockaddr *)cli_name,
+			(unsigned int *)cli_name_len);
 
 		//pass pointer to the counter to threads
 		req.c_data = &c_data;
