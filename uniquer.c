@@ -30,13 +30,39 @@ void * handle_request(void *arg) {
 		SOCKADDR_LEN);
 }
 
-int main() {
+int main(int argc, char **argv) {
 	//constants
 	const unsigned int DEFAULT_SAVE_EVERY = 10000;
 	const char * DEFAULT_PATH = "counter.txt";
 	const short int DEFAULT_PORT = 9999;
-	//TODO: add command line options to override
 
+	//options
+	char * opt_path = malloc(strlen(DEFAULT_PATH));
+	opt_path = strdup(DEFAULT_PATH);
+	short int opt_port = DEFAULT_PORT;
+	unsigned int opt_save_every = DEFAULT_SAVE_EVERY;
+
+	//parse options
+	int ch;
+	opterr = 0;
+	while ((ch = getopt(argc, argv, "p:f:s:")) != -1) {
+		printf("Option: %c\n", ch);
+		switch (ch) {
+			case 'p': {
+				opt_port = atoi((char *)optarg);
+				printf("Setting Port To: %d\n", opt_port);
+				break;
+			}
+			case 'f': {
+				opt_path = strdup(optarg);
+				printf("Setting Path To: %s\n", opt_path);
+				break;
+			}
+			case 's': {
+				break;
+			}
+		}
+	}
 	//one file descriptor
 	FILE *fd;
 
@@ -52,8 +78,8 @@ int main() {
 	//initialize counter_data
 	c_data.counter = &counter;
 	c_data.last_save = &last_save;
-	c_data.path = strdup(DEFAULT_PATH);
-	c_data.save_every = DEFAULT_SAVE_EVERY;
+	c_data.path = strdup(opt_path);
+	c_data.save_every = opt_save_every;
 	c_data.fd = fd;
 	counter_init(&c_data);
 
@@ -65,7 +91,7 @@ int main() {
 	}
 	bzero(&serv_name, sizeof(serv_name));
 	serv_name.sin_family = AF_INET;
-	serv_name.sin_port = htons(DEFAULT_PORT);
+	serv_name.sin_port = htons(opt_port);
 	len = sizeof(serv_name);
 	if (bind(sock, (struct sockaddr *)&serv_name, len) < 0) {
 		printf("Couln't bind :( \n");
