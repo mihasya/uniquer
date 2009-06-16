@@ -57,6 +57,7 @@ int main(int argc, char **argv) {
 				break;
 			}
 			case 's': {
+				opt_save_every = atoi((char *)optarg);
 				break;
 			}
 		}
