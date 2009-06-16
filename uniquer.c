@@ -11,6 +11,8 @@
 
 pthread_mutex_t counter_mutex;
 
+const unsigned int SOCKADDR_LEN = sizeof(struct sockaddr_in);
+
 void * handle_request(void *arg) {
 	request req = *(request *)arg;
 	unsigned long long id;
@@ -25,7 +27,7 @@ void * handle_request(void *arg) {
 		sprintf(resp, "Uknown Command");
 	}
 	sendto(*(req.sock), &resp, 255, 0, (struct sockaddr *)&(req.cli_name),
-		req.cli_name_len);
+		SOCKADDR_LEN);
 }
 
 int main() {
@@ -77,10 +79,8 @@ int main() {
 		pthread_t thread;
 		request req;
 		bzero(question, sizeof(question));
-
-		recvfrom (sock, question, 255, 0, (struct sockaddr *)&(req.cli_name),
-			(unsigned int *)&(req.cli_name_len));
-
+		recvfrom (sock, question, 255, 0, (struct sockaddr *)&req.cli_name,
+			(unsigned int *)&SOCKADDR_LEN);
 		//pass pointer to the counter to threads
 		req.c_data = &c_data;
 
