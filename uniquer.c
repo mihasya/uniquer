@@ -14,13 +14,13 @@ pthread_mutex_t counter_mutex;
 const unsigned int SOCKADDR_LEN = sizeof(struct sockaddr_in);
 
 void * handle_request(void *arg) {
-	request req = *(request *)arg;
+	uniquer_request req = *(uniquer_request *)arg;
 	unsigned long long id;
 	char resp[255];
 	bzero(resp, sizeof(resp));
 	if (strcmp(req.question, "n\n")==0) {
 		pthread_mutex_lock(req.counter_mutex);
-		get_next_id(req.c_data, &id);
+		uniquer_get_next_id(req.c_data, &id);
 		pthread_mutex_unlock(req.counter_mutex);
 		sprintf(resp, "%llu", id);
 	} else {
@@ -72,14 +72,14 @@ int main(int argc, char **argv) {
 
 	//business logic vars
 	unsigned long long counter = 0, last_save = 0;
-	counter_data c_data;
+	uniquer_counter_data c_data;
 	//initialize counter_data
 	c_data.counter = &counter;
 	c_data.last_save = &last_save;
 	c_data.path = strdup(opt_path);
 	c_data.save_every = opt_save_every;
 	c_data.fd = fd;
-	counter_init(&c_data);
+	uniquer_counter_init(&c_data);
 
 	//initialize TEH SOCKET!
 	sock = socket(AF_INET, SOCK_DGRAM, 0);
@@ -101,7 +101,7 @@ int main(int argc, char **argv) {
 
 	for (;;) {
 		pthread_t thread;
-		request req;
+		uniquer_request req;
 		bzero(question, sizeof(question));
 		recvfrom (sock, question, 255, 0, (struct sockaddr *)&req.cli_name,
 			(unsigned int *)&SOCKADDR_LEN);

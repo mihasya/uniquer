@@ -9,16 +9,16 @@ typedef struct {
     short int save_every;
     char *path;
     FILE *fd;
-} counter_data;
+} uniquer_counter_data;
 
 typedef struct {
-    counter_data *c_data;
+    uniquer_counter_data *c_data;
     int *sock;
     struct sockaddr_in cli_name;
     char *question;
     pthread_mutex_t *counter_mutex;
-} request;
+} uniquer_request;
 
-int counter_init(counter_data *c_data);
-int get_next_id(counter_data *c_data, unsigned long long *id);
-int save_counter(counter_data *c_data);
+int uniquer_counter_init(uniquer_counter_data *c_data);
+int uniquer_get_next_id(uniquer_counter_data *c_data, unsigned long long *id);
+int uniquer_save_counter(uniquer_counter_data *c_data);
