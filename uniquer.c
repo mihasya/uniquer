@@ -14,7 +14,7 @@ pthread_mutex_t counter_mutex;
 const unsigned int SOCKADDR_LEN = sizeof(struct sockaddr_in);
 
 void * handle_request(void *arg) {
-	request req = (request)*(request *)arg;
+	request req = *(request *)arg;
 	unsigned long long id;
 	char resp[255];
 	bzero(resp, sizeof(resp));
@@ -47,16 +47,13 @@ int main(int argc, char **argv) {
 	int ch;
 	opterr = 0;
 	while ((ch = getopt(argc, argv, "p:f:s:")) != -1) {
-		printf("Option: %c\n", ch);
 		switch (ch) {
 			case 'p': {
 				opt_port = atoi((char *)optarg);
-				printf("Setting Port To: %d\n", opt_port);
 				break;
 			}
 			case 'f': {
-				opt_path = strdup(optarg);
-				printf("Setting Path To: %s\n", opt_path);
+				opt_path = strdup((char *)optarg);
 				break;
 			}
 			case 's': {
