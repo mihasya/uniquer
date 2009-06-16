@@ -30,6 +30,7 @@ int save_counter(counter_data *c_data) {
 	fputs(counter_str, c_data->fd);
 	*(c_data->last_save) = *(c_data->counter);
 	fflush(c_data->fd);
+	return 0;
 }
 int get_next_id(counter_data *c_data, unsigned long long *id) {
 	*id = ++(*(c_data->counter));

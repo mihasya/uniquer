@@ -14,7 +14,7 @@ pthread_mutex_t counter_mutex;
 const unsigned int SOCKADDR_LEN = sizeof(struct sockaddr_in);
 
 void * handle_request(void *arg) {
-	request req = *(request *)arg;
+	request req = (request)*(request *)arg;
 	unsigned long long id;
 	char resp[255];
 	bzero(resp, sizeof(resp));
@@ -26,8 +26,9 @@ void * handle_request(void *arg) {
 	} else {
 		sprintf(resp, "Uknown Command");
 	}
-	sendto(*(req.sock), &resp, 255, 0, (struct sockaddr *)&(req.cli_name),
+	sendto(*(req.sock), &resp, 255, 0, (struct sockaddr *)&req.cli_name,
 		SOCKADDR_LEN);
+	return arg;
 }
 
 int main(int argc, char **argv) {
