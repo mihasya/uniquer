@@ -15,7 +15,6 @@ typedef struct {
     counter_data *c_data;
     int *sock;
     struct sockaddr_in cli_name;
-    size_t cli_name_len;
     char *question;
     pthread_mutex_t *counter_mutex;
 } request;
