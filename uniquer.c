@@ -67,7 +67,6 @@ int main(int argc, char **argv) {
 
 	//socket/request stuff
 	int sock;
-	size_t len;
 	struct sockaddr_in serv_name;
 	char question[255];
 
@@ -91,12 +90,10 @@ int main(int argc, char **argv) {
 	bzero(&serv_name, sizeof(serv_name));
 	serv_name.sin_family = AF_INET;
 	serv_name.sin_port = htons(opt_port);
-	len = sizeof(serv_name);
-	if (bind(sock, (struct sockaddr *)&serv_name, len) < 0) {
+	if (bind(sock, (struct sockaddr *)&serv_name, SOCKADDR_LEN) < 0) {
 		printf("Couln't bind :( \n");
 		exit(1);
 	}
-	len = sizeof(serv_name);
 
 	pthread_mutex_init(&counter_mutex, NULL);
 
