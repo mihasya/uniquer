@@ -1,3 +1,9 @@
+# This is stupid code
+
+Doing a bit of spring cleaning on my computer, so just uploading repos that I find that I may find useful later.
+
+This is almost certainly horrible C code; I wrote it a long time ago just to remind myself that I could still maybe do C at the time.
+
 # Description
 
 uniquer is a very simple program - it's just a counter. Every time you send 'n' to it, it will return the next incremented value. Its primary intended use is for generating unique IDs for federated environments.
